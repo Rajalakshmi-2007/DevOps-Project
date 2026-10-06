@@ -21,7 +21,7 @@ pipeline {
   stages {
     stage('Backend: lint and tests') {
       steps {
-        sh '''
+        bat '''
           set -e
           python3 -m venv .venv
           . .venv/bin/activate
@@ -36,7 +36,7 @@ pipeline {
 
     stage('Frontend: JavaScript check') {
       steps {
-        sh '''
+        bat '''
           set -e
           for f in frontend/js/*.js; do
             name=$(basename "$f" .js)
@@ -50,13 +50,13 @@ pipeline {
 
     stage('Docker: build image') {
       steps {
-        sh 'docker build -t ${IMAGE}:${BUILD_NUMBER} .'
+        bat 'docker build -t ${IMAGE}:${BUILD_NUMBER} .'
       }
     }
 
     stage('Docker: smoke test') {
       steps {
-        sh '''
+        bat '''
           set -e
           docker rm -f cmms-smoke || true
           docker run -d --name cmms-smoke \
@@ -82,7 +82,7 @@ pipeline {
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-          sh '''
+          bat '''
             set -e
             echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
             docker tag ${IMAGE}:${BUILD_NUMBER} $DH_USER/${IMAGE}:${BUILD_NUMBER}
@@ -98,7 +98,7 @@ pipeline {
 
   post {
     always {
-      sh 'docker rm -f cmms-smoke || true'
+      bat 'docker rm -f cmms-smoke || true'
     }
     success {
       echo 'Pipeline finished: image built, tested and (on main) pushed to Docker Hub.'
