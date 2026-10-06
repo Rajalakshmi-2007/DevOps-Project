@@ -371,7 +371,7 @@ pipeline {
                         echo DOCKER HUB: LOGIN
                         echo ==========================================
 
-                        echo %DH_PASS% | docker login -u %DH_USER% --password-stdin
+                        echo %DH_PASS%| docker login -u %DH_USER% --password-stdin
 
                         if errorlevel 1 (
                             echo ERROR: Docker Hub login failed.
