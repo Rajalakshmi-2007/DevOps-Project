@@ -1,0 +1,35 @@
+# Local production-like stack: API + web UI + PostgreSQL.
+#   docker compose up --build        ->  http://localhost:8000
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: campus
+      POSTGRES_DB: campus
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus -d campus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://campus:campus@db:5432/campus
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in a .env file next to docker-compose.yml}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in a .env file next to docker-compose.yml}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in a .env file next to docker-compose.yml}
+    volumes:
+      - uploads:/data
+
+volumes:
+  pgdata:
+  uploads:

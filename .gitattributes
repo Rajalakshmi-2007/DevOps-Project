@@ -1,0 +1,5 @@
+# Keep Unix line endings so shell steps in the Jenkinsfile and Docker build work on Windows too.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.zip binary
